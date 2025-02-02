@@ -1,261 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Chat Interface</title>
-    <style>
-        :root {
-            --primary-color: #0078D4;
-            --background-color: #f8f9fa;
-            --header-height: 64px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: var(--background-color);
-        }
-
-        #banner {
-            background: white;
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-
-        h1 {
-            color: #1a1a1a;
-            font-size: 1.25rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        h1::before {
-            content: '';
-            width: 24px;
-            height: 24px;
-            background: var(--primary-color);
-            border-radius: 50%;
-        }
-
-        #refresh-button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        #refresh-button:hover {
-            background-color: #006cbd;
-        }
-
-        #refresh-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        #refresh-button svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        #refresh-button.loading svg {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        #webchat {
-            height: calc(100% - var(--header-height));
-            position: fixed;
-            top: var(--header-height);
-            width: 100%;
-            background: white;
-            border-radius: 12px 12px 0 0;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: var(--header-height);
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEAP 2025 Virtual Assistants</title>
+<style>
+   * {
+        font-family: "Calibri", Arial, sans-serif;
+    }
+    body {
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #00274d, #00a3e0);
+        color: white;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .content {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .content h1 {
+        font-size: 36px;
+        margin: 0;
+    }
+    .content p {
+        font-size: 16px;
+        margin-top: 10px;
+        line-height: 1.5;
+    }
+    .chatbot-wrapper {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .chatbot-container {
+        width: 400px;
+        height: 700px;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    .chatbot-header {
+        background: linear-gradient(90deg, #00274d, #00a3e0);
+        color: white;
+        padding: 15px;
+        font-size: 22px;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-align: center;
+    }
+    .event-description {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px;
+        color: #666;
+        background-color: #f7f7f7;
+        text-align: center;
+    }
+    .chatbot-frame {
+        width: 100%;
+        height: calc(100% - 150px);
+        border: none;
+    }
+    .refresh-btn {
+        width: 100%;
+        padding: 10px;
+        background-color: #00a3e0;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+    .refresh-btn:hover {
+        background-color: #008ac0;
+    }
+    .footer {
+        background-color: #00274d;
+        color: white;
+        font-size: 12px;
+        padding: 8px 0;
+        text-align: center;
+    }
+</style>
 </head>
 <body>
-    <div>
-        <div id="banner">
-            <h1>AI Assistant</h1>
-            <button id="refresh-button">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 2v6h-6"></path>
-                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
-                    <path d="M3 22v-6h6"></path>
-                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
-                </svg>
-                Restart Chat
-            </button>
+<div class="content">
+<h1>Welcome to LEAP 2025 Virtual Assistants</h1>
+<p>
+    Explore the event with our Knowledge Assistant or have some fun with the Entertainment Bot. 
+    <strong>LEAP 2025</strong> is here to innovate, inspire, and entertain!
+</p>
+</div>
+<div class="chatbot-wrapper">
+
+    <!-- Knowledge & Entertainment Chatbot -->
+    <div class="chatbot-container">
+        <div class="chatbot-header">Knowledge & Entertainment Assistant</div>
+        <div class="event-description">
+            Enjoy exclusive <strong>LEAP 2025</strong> entertainment content.
         </div>
-        <div id="webchat" role="main"></div>
-        <div class="loading-overlay">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M12 6v6l4 2"></path>
-                </svg>
-                Reconnecting...
-            </div>
-        </div>
+        <iframe 
+            class="chatbot-frame"
+            id="chatbotFrame"
+            src="https://copilotstudio.microsoft.com/environments/Default-fc3b3043-d920-470a-8ae0-b2610bb2aea5/bots/cr0c2_agent/webchat?__version__=2">
+        </iframe>
+        <button class="refresh-btn" onclick="refreshChat()">Refresh Chat</button>
+        <div class="footer">Powered by LEAP Entertainment</div>
     </div>
 
-    <script crossorigin="anonymous" src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+</div>
 
-    <script>
-        (async function () {
-            let currentDirectLine = null;
-            const styleOptions = {
-                hideUploadButton: true,
-                backgroundColor: 'transparent',
-                bubbleBackground: '#f0f2f5',
-                bubbleBorderRadius: 12,
-                bubbleFromUserBackground: 'var(--primary-color)',
-                bubbleFromUserBorderRadius: 12,
-                bubbleFromUserTextColor: 'white',
-                sendBoxBackground: 'white',
-                sendBoxBorderTop: '1px solid #eee',
-                sendBoxTextBox: {
-                    borderRadius: 24,
-                    borderColor: '#e0e0e0'
-                }
-            };
+<script>
+    function refreshChat() {
+        document.getElementById("chatbotFrame").src += "";
+    }
+</script>
 
-            async function getDirectLineToken() {
-                const tokenEndpointURL = new URL('https://defaultfc3b3043d920470a8ae0b2610bb2ae.a5.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr0c2_agent/directline/token?api-version=2022-03-01-preview');
-                const response = await fetch(tokenEndpointURL);
-                if (!response.ok) throw new Error('Failed to retrieve Direct Line token.');
-                return response.json();
-            }
-
-            async function initializeChat() {
-                const webchatElement = document.getElementById('webchat');
-                const loadingOverlay = document.querySelector('.loading-overlay');
-                const refreshButton = document.getElementById('refresh-button');
-                
-                try {
-                    // Get token and regional settings
-                    const { token } = await getDirectLineToken();
-                    const tokenEndpointURL = new URL('https://defaultfc3b3043d920470a8ae0b2610bb2ae.a5.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr0c2_agent/directline/token?api-version=2022-03-01-preview');
-                    const apiVersion = tokenEndpointURL.searchParams.get('api-version');
-                    
-                    const regionalSettingsResponse = await fetch(
-                        new URL(`/powervirtualagents/regionalchannelsettings?api-version=${apiVersion}`, tokenEndpointURL)
-                    );
-                    if (!regionalSettingsResponse.ok) throw new Error('Failed to retrieve regional settings.');
-                    const { channelUrlsById: { directline } } = await regionalSettingsResponse.json();
-
-                    // Create new DirectLine instance
-                    currentDirectLine = WebChat.createDirectLine({
-                        domain: new URL('v3/directline', directline),
-                        token
-                    });
-
-                    // Clear existing chat
-                    webchatElement.innerHTML = '';
-
-                    // Initialize new chat
-                    WebChat.renderWebChat({
-                        directLine: currentDirectLine,
-                        styleOptions,
-                        locale: document.documentElement.lang || 'en'
-                    }, webchatElement);
-
-                    // Send start conversation event
-                    currentDirectLine.postActivity({
-                        type: 'event',
-                        name: 'startConversation',
-                        locale: document.documentElement.lang || 'en',
-                        localTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                    }).subscribe();
-
-                } catch (error) {
-                    console.error('Chat initialization failed:', error);
-                } finally {
-                    loadingOverlay.classList.remove('active');
-                    refreshButton.disabled = false;
-                    refreshButton.classList.remove('loading');
-                }
-            }
-
-            // Initialize chat for the first time
-            await initializeChat();
-
-            // Add refresh functionality
-            const refreshButton = document.getElementById('refresh-button');
-            const loadingOverlay = document.querySelector('.loading-overlay');
-
-            refreshButton.addEventListener('click', async () => {
-                refreshButton.disabled = true;
-                refreshButton.classList.add('loading');
-                loadingOverlay.classList.add('active');
-
-                try {
-                    // Properly close the existing connection if it exists
-                    if (currentDirectLine) {
-                        await new Promise((resolve) => {
-                            currentDirectLine.end();
-                            setTimeout(resolve, 1000); // Give some time for the connection to close
-                        });
-                    }
-
-                    // Initialize new chat
-                    await initializeChat();
-                } catch (error) {
-                    console.error('Failed to restart chat:', error);
-                    refreshButton.disabled = false;
-                    refreshButton.classList.remove('loading');
-                    loadingOverlay.classList.remove('active');
-                }
-            });
-        })();
-    </script>
 </body>
 </html>
